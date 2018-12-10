@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 
+PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- 任务：配置持久层 -->
+<configuration>
+	<settings>
+		<!-- 开启二级缓存 默认值为true   -->
+		<setting name="cacheEnabled" value="true"/>
+		<!-- 当主键是自增的情况下，添加一条记录的同时返回该主键，在mybatis.xml中设置：useGeneratedKeys="true"
+		并在映射文件中加keyProperty="对应的主键的对象"属性 也可以在映射文件中直接设置 useGeneratedKeys="true" -->
+		<setting name="useGeneratedKeys" value="true" /> 
+		<!-- 配置默认的执行器 SIMPLE：就是普通的执行器;REUSE：执行器会重用预处理语句（prepared statements);BATCH：执行器将重用语句并执行批量更新 -->
+        <setting name="defaultExecutorType" value="REUSE" />
+        <!-- 指定结果集中值为 null时是否调用映射对象的 setter（map对象时为put）方法，对于有 Map.keySet()依赖或 null值初始化的时候是有用的。注意基本类型（int、boolean等）是不能设置成 null 的 -->
+        <setting name="callSettersOnNulls" value="true"/> 
+        <!-- 指定 MyBatis所用日志的具体实现，未指定时将自动查找.类型：SLF4J,LOG4J,LOG4J2,JDK_LOGGING,COMMONS_LOGGING,STDOUT_LOGGING,NO_LOGGING 
+       		此处设置的日志只针对mybatis框架的（如对数据库的增删改查的日志信息），不包括视图层与业务层的日志信息，对视图层与业务层则需要在代码中添加日志信息-->
+        <setting name="logImpl" value="LOG4J"/>        
+	</settings>
+	
+	<!-- 定义类型别名 -->
+	<typeAliases>
+		<!-- 设定每个实体的别名，要包括包的全类名 -->
+		<typeAlias type="com.comfor.beans.comfor.Student" alias="student"/>
+		<!-- 添加用于map传参与返回值 -->
+		<typeAlias type="com.comfor.util.tools.PageData" alias="pd"/>
+		<!-- 添加用于分页 -->
+		<typeAlias type="com.comfor.util.tools.Page" alias="page"/>
+		<!-- 将指定包中所有类的简单类名当作其别名（每个类的别名的其简单类的名称（简单类为不包括包路经的类名，也就是类名）） -->
+		<!-- typeAlias与package两种定义别名方式只能用一种不用混用 -->
+		<!-- <package name="com.comfor.beans.comfor"/> -->
+	</typeAliases>
+	
+	<!-- 工具插件 --> 	
+	<plugins>	
+	    <!-- pagehelper工具的使用配置  -->
+		<plugin interceptor="com.github.pagehelper.PageInterceptor">
+			<property name="reasonable" value="true"/>
+		</plugin>
+		<!-- 自动分页工具 -->		
+		<plugin interceptor="com.comfor.util.tools.PagePlugin">
+			<!-- 针对oracle数据库的分页 -->
+			<!-- <property name="dialect" value="oracle"/> -->
+			<!-- 针对mysql数据库的分页 -->
+			<property name="dialect" value="mysql"/>
+			<property name="pageSqlId" value=".*listPage.*"/>
+		</plugin>
+	</plugins>
+	
+	<!-- 注册映射文件 -->
+	<!-- 
+  	<mappers>
+		<mapper resource="SQLMapper/StudentMapper.xml"/>
+	</mappers>
+ 	-->
+ 	<!-- 用于mybatis注解开发的设置 只到dao层不到且体的dao接口-->
+ 	<!-- 注解开发与上面设置的注册映射文件形式开发是相对，两者只能选择其一，因为此两个配置只能配置其一 -->
+	<!--  	
+	<mappers>
+ 		<package name="com.comfor.dao"/>
+ 	</mappers>
+ 	-->	
+	
+</configuration>

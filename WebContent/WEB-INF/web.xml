@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+	
+	<display-name>SSM</display-name>
+
+	<!-- 1  指定Spring容器配置文件位置与名称 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>   
+		<param-value>
+			classpath:applicationContext.xml
+			classpath:springmvc.xml
+			<!-- classpath:quartz-scheduler.xml -->		<!-- 定时任务 -->
+		</param-value>
+	</context-param>
+	
+	<!-- 2  注册ServletContext监听器 -->
+	<!-- 1 在ServletContext被创建时，创建Spring容器对象    2 将创建好的spring容器对象放入到ServletContext的域属性空间中 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- 3  注册字符编码过滤器 -->
+	<!--<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		&lt;!&ndash; 设置字符集为:UTF-8 &ndash;&gt;
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		&lt;!&ndash; 设置强制使用指定的字符集，以防其他地方设置字符集 &ndash;&gt;
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>		
+	</filter>-->
+	
+	<!-- 4   注册SpringMVC中央调度器：用于用户在浏览器访问服务到执行处理器的执行过程 -->
+	<servlet>
+		<servlet-name>SpringMVC</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 设置SpringMVC配置文件位置与名称 -->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:springmvc.xml</param-value>
+		</init-param>
+		<!-- 设置开启服务则启动 -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SpringMVC</servlet-name>
+		<!-- <url-pattern/>设置，不能写为/*，最好也不要写为/，建议写为*.do 的形式 -->
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 5  设置项目启动登录页面 -->
+	<welcome-file-list>
+		<welcome-file>/WEB-INF/index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	
+	<!-- 6  阿里巴巴数据库连接池 WEB方式监控配置：运行服务器，浏览器输入 http://IP:PROT/项目名/druid就可以打开Druid的监控页面 -->
+	<servlet>
+		<servlet-name>DruidStatView</servlet-name>
+		<servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DruidStatView</servlet-name>
+		<url-pattern>/druid/*</url-pattern>
+	</servlet-mapping>
+	<filter>
+		<filter-name>druidWebStatFilter</filter-name>
+		<filter-class>com.alibaba.druid.support.http.WebStatFilter</filter-class>
+		<init-param>
+			<param-name>exclusions</param-name>
+			<param-value>/static/*,*.js,*.css,/druid*,*.jsp,*.swf</param-value>
+		</init-param>
+		<init-param>
+			<param-name>principalSessionName</param-name>
+			<param-value>sessionInfo</param-value>
+		</init-param>
+		<init-param>
+			<param-name>profileEnable</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>druidWebStatFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- 8 监听器 
+	servlet规范中定义了8个监听器，用于监听的对象为：request,session,servletContext，对这三种对象的创建与销毁，和他们域空间中的
+	添加，删除，修改，以及session的钝化与活化的操作监听
+	-->	
+	<!-- 
+	<listener>
+		<listener-class>com.comfor.listener.MyRequestListener</listener-class>
+	</listener>
+	 -->
+	<!-- 
+	<listener>
+		<listener-class>com.comfor.listener.MyRequestAttributeListener</listener-class>
+	</listener>
+	 -->
+	<!-- 
+	<listener>
+		<listener-class>com.comfor.listener.MySessionListener</listener-class>
+	</listener>
+	 -->
+	<!-- 
+	<listener>
+		<listener-class>com.comfor.listener.MySessionAttributeListener</listener-class>
+	</listener>
+	 --> 
+	<!--  
+	<listener>
+		<listener-class>com.comfor.listener.MyServletContextListener</listener-class>
+	</listener>
+	 -->
+	<!-- 	
+	<listener>
+		<listener-class>com.comfor.listener.MyServletContextAttributeListener</listener-class>
+	</listener>
+	 -->
+	
+	
+	 
+</web-app>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+ChineseToUnicode		汉字转换成Unicode编码
+Const					各种参数（只做原先框架所用）
+ContainChinese			判断字体串中是否包含有汉字
+DateUtil				获取各种时间格式
+DelAllFile				java删除所有文件和文件夹
+FileDownload			下载文件
+FileUtil				操作文件目录
+FileZip					java压缩文件成zip包
+Freemarker				打印输出方式（控制台，文件）
+FtpUploadDownload		ftp文件上传下载
+GetPinyin				获取中文全拼音，获取中文首字母，将字符串转移为ASCII码
+ImageAnd64Binary		图片与二进限的相互转换
+LatLonUtil				经度纬度周长
+Logger					日志处理
+MapDistance				根据两个位置的经纬度计算两地距离,获取当前用户一定距离以内的经纬度值
+MD5						获取MD5值
+ObjectExcelRead			从Excel表文件中读取数据
+ObjectExcelView			页面导出数据以Excel文件保存
+PageData				Map集合的重定，也可用于分页
+PathUtil				获取各种路经（包括图片）
+PagePlugin				自动分页工具
+Page					分页
+PropertiesUtil			获取与设置配置文件
+PublicUtil				获取本机IP与本项目绝对路经
+ReflectHelper			反射工具
+RequestUtil				获取请求值
+SendSMS					发送短信
+SMSUtil					通过短信接口发送短信
+SortUtil				对List集合的各种排序
+StringUtil				以逗号分隔的字符串转换成字符串数组
+Tools					工具类：1 随机生成六位数验证码  
+								2 检测字符串是否不为空,检测字符串是否为空 
+								3 字符串转换为字符串数组,分隔成字符数据组 
+								4 各种时间格式转换
+								5 以单行写入text文本中,读取txt里的单行内容
+								6 验证邮箱,验证手机号码,检测KEY是否正确  
+Uploader				UEditor(百度编辑器)文件上传辅助类
+UuidUtil				生成UUID码（通用唯一识别码）
+Watermark				水印工具类
+WebSocket				websocket工具类

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	id="WebApp_ID" version="3.1">
+	
+	<display-name>SSM</display-name>
+
+	<!-- 1  指定Spring容器配置文件位置与名称 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>   
+		<param-value>
+			classpath:applicationContext.xml
+			classpath:springmvc.xml
+			<!-- classpath:quartz-scheduler.xml -->		<!-- 定时任务 -->
+		</param-value>
+	</context-param>
+	
+	<!-- 2  注册ServletContext监听器 -->
+	<!-- 1 在ServletContext被创建时，创建Spring容器对象    2 将创建好的spring容器对象放入到ServletContext的域属性空间中 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	<!-- 3  注册字符编码过滤器 -->
+	<filter>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<!-- 设置字符集为:UTF-8 -->
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<!-- 设置强制使用指定的字符集，以防其他地方设置字符集 -->
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>		
+	</filter>
+	
+	<!-- 4   注册SpringMVC中央调度器：用于用户在浏览器访问服务到执行处理器的执行过程 -->
+	<servlet>
+		<servlet-name>SpringMVC</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 设置SpringMVC配置文件位置与名称 -->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:springmvc.xml</param-value>
+		</init-param>
+		<!-- 设置开启服务则启动 -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SpringMVC</servlet-name>
+		<!-- <url-pattern/>设置，不能写为/*，最好也不要写为/，建议写为*.do 的形式 -->
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<!-- 5  设置项目启动登录页面 -->
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	
+	<!-- 6  阿里巴巴数据库连接池 WEB方式监控配置：运行服务器，浏览器输入 http://IP:PROT/项目名/druid就可以打开Druid的监控页面 -->
+	<servlet>
+		<servlet-name>DruidStatView</servlet-name>
+		<servlet-class>com.alibaba.druid.support.http.StatViewServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DruidStatView</servlet-name>
+		<url-pattern>/druid/*</url-pattern>
+	</servlet-mapping>
+	<filter>
+		<filter-name>druidWebStatFilter</filter-name>
+		<filter-class>com.alibaba.druid.support.http.WebStatFilter</filter-class>
+		<init-param>
+			<param-name>exclusions</param-name>
+			<param-value>/static/*,*.js,*.css,/druid*,*.jsp,*.swf</param-value>
+		</init-param>
+		<init-param>
+			<param-name>principalSessionName</param-name>
+			<param-value>sessionInfo</param-value>
+		</init-param>
+		<init-param>
+			<param-name>profileEnable</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>druidWebStatFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- 7 过滤器：过滤用户的请求 -->	
+	<filter>
+		<filter-name>SomeFilter</filter-name>
+		<filter-class>com.comfor.filter.SomeFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>SomeFilter</filter-name>
+		<url-pattern>/SomeFilter/*</url-pattern>
+	</filter-mapping>
+	
+	<filter>
+		<filter-name>ConfigFilter</filter-name>
+		<filter-class>com.comfor.filter.ConfigFilter</filter-class>
+		<init-param>
+			<param-name>school</param-name>
+			<param-value>32th middle school</param-value>
+		</init-param>
+		<init-param>
+			<param-name>grade</param-name>
+			<param-value>7</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>ConfigFilter</filter-name>
+		<url-pattern>/ConfigFilter/*</url-pattern>
+		<!-- <url-pattern>/*</url-pattern> -->   <!-- 过滤全部请求 -->
+		<!-- <url-pattern>/</url-pattern> -->   <!-- 不过滤请求，与servlet不同，servlet还是拦截全部请求 -->
+		<!-- <servlet-name>someServlet</servlet-name> -->  <!-- 也可以直接过滤指定的servlet -->
+	</filter-mapping>
+	
+	<servlet>
+		<servlet-name>SomeServlet</servlet-name>
+		<servlet-class>com.comfor.servlet.SomeServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SomeServlet</servlet-name>
+		<url-pattern>/someServlet</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>OtherServlet</servlet-name>
+		<servlet-class>com.comfor.servlet.OtherServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>OtherServlet</servlet-name>
+		<url-pattern>/otherServlet</url-pattern>
+	</servlet-mapping>
+	<filter>
+		<filter-name>Some2Filter</filter-name>
+		<filter-class>com.comfor.filter.Some2Filter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>Some2Filter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>ERROR</dispatcher>
+		<!--
+			FORWARD：表示当前过滤器只会拦截由一个Servlet通过RequestDispatcher的forward()完成的跳转
+			INCLUDE：表示当前过滤器只会拦截由一个Servlet通过RequestDispatcher的include()完成的跳转
+			REQUEST：表示当前过滤器会拦截普通请求，但对于forward()与include的跳转不进行拦截。默认值
+			ERROR：表示当跳转到指定的错误处理页面时，这个跳转请求会被当前过滤器拦截
+		-->
+	</filter-mapping>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error.jsp</location>
+	</error-page>
+	
+	<servlet>
+		<servlet-name>Some3Servlet</servlet-name>
+		<servlet-class>com.comfor.servlet.Some3Servlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Some3Servlet</servlet-name>
+		<url-pattern>/some3Servlet</url-pattern>
+	</servlet-mapping>
+	<filter>
+		<filter-name>Some3Filter</filter-name>
+		<filter-class>com.comfor.filter.Some3Filter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>Some3Filter</filter-name>
+		<url-pattern>/some3Servlet/*</url-pattern>
+	</filter-mapping>
+	
+	<!--  
+	过滤器过滤顺序：
+	Some4Filter过滤用户提交的请求   chain before 
+	Some5Filter过滤用户提交的请求   chain before 
+	执行Some4Servlet
+	Some5Filter过滤服务器回送的响应  chain after 
+	Some4Filter过滤服务器回送的响应  chain after 
+	
+	当应用中存在多个Filter时，其执行顺序与其注册顺序一致	
+	-->
+	<!-- 回顾Servlet的执行原理 
+		 两个Map：
+		 Web容器中存在两个Map，这两个Map的key均为Servlet注册时的<url-pattern/>值，但其value是不同的。
+		 第一个Map的value是Servlet实例对象的引用，第二个Map的value为<servlet-class/>的值，即Servlet类的全限定性类名。
+		 执行原理：
+		 当对Servlet的请求到达Servlet容器时，会先对请求进行解析，使用解析出的URI，作为比较对象，从第一个Map中查找是否有匹配的key。
+		 若存在匹配的key，那么读取其value，即Servlet对象的引用，执行该Servlet的service()方法。不再向后查找了。
+		 若不存在匹配的key，那么再从第二个Map中查找是否有匹配的key。若存在，则读取其value，即要访问的Servlet的全限定性类名。然后
+		 使用反射机制创建该Servlet实例，并将该实例写入到第一个Map中，然后再执行该Servlet的service()方法。
+		 Class.forName(className)
+		 若第二个Map中也没有找到匹配的key，那么跳转到系统错误处理页面404。
+	-->
+	<!-- Filter的执行原理
+		一个数组与一个Map：
+		一个Map：Map的key为<url-pattern/>的值，value为Filter实例对象的引用
+		一个数组：存放着与请求相匹配的所有Filter
+		执行原理：
+		当对某资源的请求到达Web容器时，会先对请求进行解析，使用解析出的URI作为比较对象，从Map中查找是否存在相匹配的key。
+		若存在，那么读取其value，即Filter对象的引用，将该引用存入到数组中。然后继续向后查找，直到将该Map查找完毕。这样
+		在数组中就会存在按照查找顺序排好序的Filter引用。
+		数组初始化完毕后，开始按照数组元素顺序进行执行。所有数组中的Filter全部执行完毕后，再跳转到请求的目标资源。
+	-->
+	<servlet>
+		<servlet-name>Some4Servlet</servlet-name>
+		<servlet-class>com.comfor.servlet.Some4Servlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Some4Servlet</servlet-name>
+		<url-pattern>/some4Servlet</url-pattern>
+	</servlet-mapping>
+	<filter>
+		<filter-name>Some4Filter</filter-name>
+		<filter-class>com.comfor.filter.Some4Filter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>Some4Filter</filter-name>
+		<url-pattern>/some4Servlet/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>Some5Filter</filter-name>
+		<filter-class>com.comfor.filter.Some5Filter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>Some5Filter</filter-name>
+		<url-pattern>/some4Servlet/*</url-pattern>
+	</filter-mapping>
+	
+</web-app>
+

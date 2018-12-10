@@ -1,0 +1,31 @@
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xsi:noNamespaceSchemaLocation="../config/ehcache.xsd">
+   
+    <!-- 如下设置一般不做修改
+    	 1 在此配置文件中设置全局缓存配置      2 在映射文件中局部设置每个namespace的缓存
+    diskStore  指定数据在磁盘中的存储位置
+    defaultCache  指定ehcache二级存在的管理策略
+	    maxElementsInMemory="10000"    			在内存中缓存的对象的最大数目		         
+	    eternal="false"							设定缓存的对象是否永远不过期。默认设置false
+	    overflowToDisk="false"					设定当内存缓存溢出的时候是否将过期的对象缓存到磁盘上
+	    timeToIdleSeconds="120"					设置允许对象处于空闲状态的最长时间，超过时间数据便会删除
+	    timeToLiveSeconds="120"					缓存对象的有效生命期，如果是0也就是element存活时间无穷大
+	    maxElementsOnDisk="10000000"			在磁盘上缓存的对象的最大数目，若是0表示无穷大
+	    diskExpiryThreadIntervalSeconds="120"	指定硬盘中缓存对象的失效时间间隔
+	    memoryStoreEvictionPolicy="LRU"			内存缓存超过限制时的策略：默认是LRU（最近最少使用），可选的有LFU（最不常使用）和FIFO（先进先出）
+     -->
+    
+    <diskStore path="java.io.tmpdir"/>    
+    <defaultCache
+            maxElementsInMemory="10000"             
+            eternal="false"
+            overflowToDisk="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            maxElementsOnDisk="10000000"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU">
+        <persistence strategy="localTempSwap"/>
+    </defaultCache>
+    
+</ehcache>

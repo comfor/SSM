@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comfor.dao.StudentDao">
+
+	<!-- 用于内置二级缓存 并设置 -->
+	<!-- <cache eviction="FIFO" flushInterval="10800000" readOnly="true" size="1024"/> -->
+	
+	<!-- 用于第三方ehcache二级缓存 并设置 此设置可以在局部的每个映射文件中设置，也可以在配置文件ehcache.xml中全局设置-->
+ 	<cache type="org.mybatis.caches.ehcache.EhcacheCache">
+		<property name="maxElementsInMemory" value="1000"/>
+		<property name="timeToIdleSeconds" value="240"/>
+	</cache>
+
+	<insert id="insertStudent" parameterType="student">
+		insert into student_4(name,age,score) values(#{name},#{age},#{score})
+	</insert>
+	
+	<delete id="deleteById" parameterType="int">
+		delete from student_4 where id=#{id}	
+	</delete>
+	
+	<update id="updateStudent" parameterType="student">
+		update student_4 set name=#{name},age=#{age},score=#{score} where id=#{id}
+	</update>	
+
+	<select id="selectAllStudents" resultType="student">
+		select * from student_4
+	</select>
+	
+	<select id="selectStudentById" parameterType="int" resultType="student">
+		select * from student_4 where id=#{id}
+	</select>
+	
+	<select id="selectAllStudentNames" resultType="String">
+		select name from student_4
+	</select>
+	
+	<select id="selectStudentNameById" parameterType="int" resultType="String">
+		select name from student_4 where id=#{id}
+	</select>
+	
+	<select id="selectStudentByIdPd" parameterType="pd" resultType="pd">
+		select * from student_4 where id=#{id}
+	</select>
+	
+	<select id="selectStudentslistPage" parameterType="page" resultType="pd">
+		SELECT * FROM student_4 WHERE name LIKE '%' #{pd.name} '%'
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

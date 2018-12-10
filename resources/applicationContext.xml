@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+    			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd 
+    			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+    			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+    			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+    			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    			http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+ 
+	<!--  配置业务层与连接池 （业务层为注解，持久层为配置）-->
+ 
+ 	<!-- 1  扫描全部组件 此部分在springmvc.xml中注册 @Component @Controller @Service -->
+	<!-- <context:component-scan base-package="com.comfor"/> -->
+ 	
+ 	<!-- 2 引入属性文件 -->
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+	
+	<!-- 3 注册数据源：连接池 -->
+	<!-- <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"> -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close"> 
+		<!-- 数据库连接四要素 -->
+		<property name="driverClassName" value="${mysql.driverClassName}"/>
+		<property name="url" value="${mysql.url}"/>
+		<property name="username" value="${mysql.username}"/>
+		<property name="password" value="${mysql.password}"/>
+		<!-- 属性类型是字符串，通过别名的方式配置扩展插件 -->
+		<property name="filters" value="${filters}" />  
+		<!-- 最大并发连接数 -->
+		<property name="maxActive" value="${maxActive}" />
+		<!-- 初始化连接数量 -->
+		<property name="initialSize" value="${initialSize}" />
+		<!-- 配置获取连接等待超时的时间 -->
+		<property name="maxWait" value="${maxWait}" />
+		<!-- 最小空闲连接数 -->
+		<property name="minIdle" value="${minIdle}" />  
+		<!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		<property name="timeBetweenEvictionRunsMillis" value="${timeBetweenEvictionRunsMillis}" />
+		<!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		<property name="minEvictableIdleTimeMillis" value="${minEvictableIdleTimeMillis}" />  
+		<!-- 用来检测连接是否有效的sql -->
+		<property name="validationQuery" value="${validationQuery}" /> 
+		<!-- 申请连接时候检测 -->
+		<property name="testWhileIdle" value="${testWhileIdle}" />  
+		<!-- 申请连接时执行validationQuery检测连接是否有效 -->
+		<property name="testOnBorrow" value="${testOnBorrow}" />  
+		<!-- 归还连接时执行validationQuery检测连接是否有效 -->
+		<property name="testOnReturn" value="${testOnReturn}" /> 
+		<!-- 要启用PSCache，必须配置大于0  -->
+		<property name="maxOpenPreparedStatements" value="${maxOpenPreparedStatements}" />
+		<!-- 打开removeAbandoned功能 -->
+		<property name="removeAbandoned" value="${removeAbandoned}" />
+		<!-- 1800秒，也就是30分钟 -->
+		<property name="removeAbandonedTimeout" value="${removeAbandonedTimeout}" />
+		<!-- 关闭abanded连接时输出错误日志 -->   
+		<property name="logAbandoned" value="${logAbandoned}" />		
+	</bean>
+	
+	<!-- 4 Spring与mybatis的完美整合-->
+	<!-- 注册sqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 引入连接池 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 引入持久层主配置文件 -->
+		<property name="configLocation" value="classpath:mybatis.xml"/>
+		<!-- 将mybatis中的映射文件配置到spring中，而mybatis中就不用配映射文件了 -->
+		<property name="mapperLocations" value="classpath:sql/*.xml"/>
+	</bean>
+	
+ 	<!-- 5  生成dao的动态代理当前配置会为指定的基本包中所有接口生成代理对象 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+		<property name="basePackage" value="com.comfor.dao"/>
+	</bean>
+	
+	<!-- 6  注册事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<!-- 设置默认为针对接口的AOP就变成了针对实现类 -->
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+	
+	<!-- 7  注册事务通知，用于AOP业务的事务管理 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 这里指定的是：为每个连接点指定所要应用的事务属性 -->
+			<tx:method name="insert*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+			<tx:method name="delete*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+			<tx:method name="update*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+			<tx:method name="save*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+			<tx:method name="*" propagation="REQUIRED" isolation="DEFAULT" rollback-for="java.lang.Exception"/>
+		</tx:attributes>
+	</tx:advice>
+	<!-- 配置aspectj的自动代理扫描，用于扫描AspectJ注解 -->
+	<aop:aspectj-autoproxy/>
+	
+	<!-- 8  事务处理 AspectJ的AOP配置 -->
+	<aop:config>
+		<aop:pointcut expression="execution(* com.comfor.service..*(..))" id="aopPointcut"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="aopPointcut"/>
+	</aop:config>
+	
+	
+<!-- 	
+	9  各种数据库与连接池的配置
+	注册数据源：Spring内置连接池 mysql数据库
+	<bean id="mySpringProDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${mysql.driverClassName}"/>
+		<property name="url" value="${mysql.url}"/>
+		<property name="username" value="${mysql.username}"/>
+		<property name="password" value="${mysql.password}"/>
+	</bean>
+	
+	注册数据源：DBCP连接池 sqlserver2005数据库
+	<bean id="myDBCPProDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${sqlserver.driverClassName}"/>
+		<property name="url" value="${sqlserver.url}"/>
+		<property name="username" value="${sqlserver.username}"/>
+		<property name="password" value="${sqlserver.password}"/>
+	</bean>
+	
+	注册数据源：C3P0连接池 oracle数据库
+	<bean id="myC3P0ProDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${oracle.driverClassName}"/>
+		<property name="jdbcUrl" value="${oracle.url}"/>
+		<property name="user" value="${oracle.username}"/>
+		<property name="password" value="${oracle.password}"/>
+	</bean>	
+ -->	
+	
+</beans>
+
+
+
+
+
+
+
+
+
+
+

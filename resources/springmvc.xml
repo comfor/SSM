@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+    			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd 
+    			http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+    			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+    			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+    			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+    			http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+	<!-- 任务：配置控制层 -->
+
+	<!-- 1  注册处理器(配置开发) 注意id要以 / 开头-->
+ 	<bean id="/myController.do" class="com.comfor.controller.comfor.MyController"/>
+ 	
+	<!-- 2  注册视图解析器  -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<!-- 截取路经的前辍 -->
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<!-- 截取路经的后辍 -->
+		<property name="suffix" value=".jsp"/>
+	</bean>
+
+    <!-- 3 注册mvc的注解驱动（注解开发） -->
+    <mvc:annotation-driven/>
+    <!-- 4 注册组件扫描器（注解开发） -->
+    <context:component-scan base-package="com.comfor"/>
+    <!-- 5 设置对静态资源的访问 -->
+    <mvc:default-servlet-handler/>
+   
+   <!-- 6 异常处理（可自定） -->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView" value="/comfor/error"/>
+		<property name="exceptionAttribute" value="ex"/>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="com.comfor.exception.NameException">/comfor/nameError</prop>
+				<prop key="com.comfor.exception.AgeException">/comfor/ageError</prop>
+			</props>
+		</property>
+	</bean>	
+	<!-- 注册异常处理器 -->
+	<bean class="com.comfor.exception.comfor.MyHandlerExceptionResolver"/>	
+	
+	
+	<!-- 7   数据检验 主要用于实体字段检验（可自定）-->
+	<!-- 生成验证器 -->
+	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
+		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
+	</bean>	
+	<!-- 注册mvc数据检验注解驱动 -->
+	<mvc:annotation-driven validator="validator"/>
+	
+	<!-- 8 文件上传 -->
+	<!--  注册MultipartFile，id为固定值 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="utf-8"/>
+		<property name="maxUploadSize" value="104857600"/>
+		<property name="maxInMemorySize" value="4096"/>
+	</bean>
+	<!-- 注册上传文件过大时的异常处理 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+		<property name="defaultErrorView" value="/static/comfor/fileError.jsp"/>
+		<property name="exceptionAttribute" value="ex"/>
+	</bean>
+
+<!-- 	
+	9  注册拦截器（可自定）
+	<mvc:interceptors>
+		<mvc:interceptor>
+			拦截所有请求
+			<mvc:mapping path="/**"/>
+			不拦截哪些请求
+			<mvc:exclude-mapping path="/test/*.do"/>
+			<bean class="com.comfor.interceptor.comfor.MyInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>	
+ -->
+	
+	<!-- 10  避免IE浏览器执ajax时，返回json出现下载文件（可自定） -->
+	<bean id="mappingJackson2HttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="supportedMediaTypes">
+			<list>
+				<value>text/html;charset=UTF-8</value>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 11  启动SpringMVC的注解功能，完成请求与注解POJO的映射（可自定） -->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<ref bean="mappingJackson2HttpMessageConverter"/>
+			</list>
+		</property>
+	</bean>
+    
+</beans>
+
